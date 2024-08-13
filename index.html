@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Location Map</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVC91ICLl4qqqvr-SX_PH2XhKcNBM3Y0w"></script>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; }
+        .map-container {
+            width: 200px; /* Szerokość mapy */
+            height: 200px; /* Wysokość mapy */
+            position: absolute; /* Umieszczenie mapy w dowolnym miejscu */
+            top: 20px; /* Odległość od góry */
+            right: 20px; /* Odległość od prawej krawędzi */
+            overflow: hidden; /* Ukrywa część mapy poza prostokątem */
+            border-radius: 50%; /* Okrągły kształt */
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5); /* Przyciemnienie dolnej części */
+        }
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="map-container">
+        <div id="map"></div>
+    </div>
+    <script>
+        let map, marker;
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 19,
+                center: { lat: 0, lng: 0 },
+                mapTypeId: google.maps.MapTypeId.SATELLITE,
+                disableDefaultUI: true,
+                gestureHandling: 'none'
+            });
+
+            marker = new google.maps.Marker({
+                map: map
+            });
+
+            updateLocation();
+            setInterval(updateLocation, 10000); // Odświeża lokalizację co 10 sekund
+        }
+
+        function updateLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var pos = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    map.setCenter(pos);
+                    marker.setPosition(pos);
+                }, function() {
+                    handleLocationError(true, map.getCenter());
+                });
+            } else {
+                handleLocationError(false, map.getCenter());
+            }
+        }
+
+        function handleLocationError(browserHasGeolocation, pos) {
+            alert(browserHasGeolocation ?
+                  'Error: The Geolocation service failed.' :
+                  'Error: Your browser doesn\'t support geolocation.');
+        }
+
+        initMap();
+    </script>
+</body>
+</html>
